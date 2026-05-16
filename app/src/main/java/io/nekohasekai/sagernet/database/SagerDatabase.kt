@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dev.matrix.roomigrant.GenerateRoomMigrations
 import io.nekohasekai.sagernet.Key
 import io.nekohasekai.sagernet.SagerNet
@@ -39,6 +40,26 @@ abstract class SagerDatabase : RoomDatabase() {
                 .enableMultiInstanceInvalidation()
                 .fallbackToDestructiveMigration()
                 .setQueryExecutor { GlobalScope.launch { it.run() } }
+                
+                // --- ДОБАВЛЯЕМ ПРАВИЛА ПРИ ПЕРВОМ ЗАПУСКЕ ---
+                .addCallback(object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        
+                        // Твой кастомный JSON для поля config
+                        val customConfig = "{\"rules\":[{\"domain\":[\"max.ru\",\"oneme.ru\",\"api.oneme.ru\"],\"geosite\":[\"category-ads-all\"],\"outbound\":\"block\"},{\"domain\":[\"telegram.org\",\"t.me\"],\"geosite\":[\"telegram\"],\"outbound\":\"proxy\"},{\"domain_keyword\":[\"yandex\",\"yastatic\",\"yadi.sk\",\"xn--80aswg\",\"xn--d1acpjx3f.xn--p1ai\",\"xn--c1avg\",\"xn--80asehdb\",\"xn--p1acf\",\"xn--p1ai\",\"gstatic.com\",\"tineye\",\"vk.com\",\"userapi.com\",\"vk-cdn.me\",\"mvk.com\",\"vk-cdn.net\",\"vk-portal.net\",\"vk.cc\",\"tradingview\"],\"domain_suffix\":[\".ru\",\".su\",\".by\"],\"geoip\":[\"private\",\"ru\",\"by\"],\"geosite\":[\"vk\",\"yandex\"],\"outbound\":\"direct\"}]}"
+                        
+                        // Вставляем запись в таблицу rules
+                        db.execSQL("""
+                            INSERT INTO rules 
+                            (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
+                            VALUES 
+                            ('Обход RU (По умолчанию)', '$customConfig', 0, 1, '', '', '', '', '', '', '', 0, '')
+                        """)
+                    }
+                })
+                // --- КОНЕЦ ДОБАВЛЕНИЯ ---
+                
                 .build()
         }
 
