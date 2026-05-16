@@ -101,6 +101,15 @@ abstract class SagerDatabase : RoomDatabase() {
                             VALUES 
                             ('RU Сегмент (Direct)', '', 4, 1, '$domainsRu', '$ipsRu', '', '', '', '', '', -1, '')
                         """)
+
+                        // 6. Правило: RU Сегмент напрямую (outbound = -1)
+                        // userOrder = 4
+                        db.execSQL("""
+                            INSERT INTO rules 
+                            (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
+                            VALUES 
+                            ('Geosite RU', '', 5, 1, 'geosite:category-ru', '', '', '', '', '', '', -1, '')
+                        """)
                     }
                 })
                 // --- КОНЕЦ ДОБАВЛЕНИЯ ----
