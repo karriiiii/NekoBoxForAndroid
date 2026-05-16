@@ -51,35 +51,55 @@ abstract class SagerDatabase : RoomDatabase() {
                         
                         val domainsTg = "geosite:telegram\ntelegram.org\nt.me"
                         
-                        val domainsRu = "geosite:vk\ngeosite:yandex\nkeyword:yandex\nkeyword:yastatic\nkeyword:yadi.sk\nkeyword:xn--80aswg\nkeyword:xn--d1acpjx3f.xn--p1ai\nkeyword:xn--c1avg\nkeyword:xn--80asehdb\nkeyword:xn--p1acf\nkeyword:xn--p1ai\nkeyword:gstatic.com\nkeyword:tineye\nkeyword:vk.com\nkeyword:userapi.com\nkeyword:vk-cdn.me\nkeyword:mvk.com\nkeyword:vk-cdn.net\nkeyword:vk-portal.net\nkeyword:vk.cc\nkeyword:tradingview\ndomain:ru\ndomain:su\ndomain:by"
+                        val domainsRu = "geosite:category-ru\nkeyword:yandex\nkeyword:yastatic\nkeyword:yadi.sk\nkeyword:xn--80aswg\nkeyword:xn--d1acpjx3f.xn--p1ai\nkeyword:xn--c1avg\nkeyword:xn--80asehdb\nkeyword:xn--p1acf\nkeyword:xn--p1ai\nkeyword:gstatic.com\nkeyword:tineye\nkeyword:vk.com\nkeyword:userapi.com\nkeyword:vk-cdn.me\nkeyword:mvk.com\nkeyword:vk-cdn.net\nkeyword:vk-portal.net\nkeyword:vk.cc\nkeyword:tradingview\ndomain:ru\ndomain:su\ndomain:by"
                         
                         val ipsRu = "geoip:private\ngeoip:ru\ngeoip:by"
 
-                        // 1. Правило: Блокировка рекламы (outbound = -2)
+                        val domainsAnalitycs = "domain:appcenter.ms\ndomain:firebase.io\ndomain:crashlytics.com"
+
+                        // 1. Правило: Блокировка QUIC (outbound = -2)
                         // userOrder = 0 (Самый высокий приоритет, срабатывает первым)
                         db.execSQL("""
                             INSERT INTO rules 
                             (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
                             VALUES 
-                            ('Блокировка рекламы', '', 0, 1, '$domainsAds', '', '', '', '', '', '', -2, '')
+                            ('Блокировка QUIC', '', 0, 1, '', '', '', '', -2, '', '', -2, '')
                         """)
 
-                        // 2. Правило: Telegram через прокси (outbound = 0)
-                        // userOrder = 1
+                        // 2. Правило: Блокировка рекламы (outbound = -2)
+                        // userOrder = 1 (Самый высокий приоритет, срабатывает первым)
                         db.execSQL("""
                             INSERT INTO rules 
                             (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
                             VALUES 
-                            ('Telegram (Proxy)', '', 1, 1, '$domainsTg', '', '', '', '', '', '', 0, '')
+                            ('Блокировка аналитики', '', 1, 1, '$domainsAnalitycs', '', '', '', '', '', '', -2, '')
                         """)
-
-                        // 3. Правило: RU Сегмент напрямую (outbound = -1)
-                        // userOrder = 2
+                        
+                        // 3. Правило: Блокировка рекламы (outbound = -2)
+                        // userOrder = 2 (Самый высокий приоритет, срабатывает первым)
                         db.execSQL("""
                             INSERT INTO rules 
                             (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
                             VALUES 
-                            ('RU Сегмент (Direct)', '', 2, 1, '$domainsRu', '$ipsRu', '', '', '', '', '', -1, '')
+                            ('Блокировка рекламы', '', 2, 1, '$domainsAds', '', '', '', '', '', '', -2, '')
+                        """)
+
+                        // 4. Правило: Telegram через прокси (outbound = 0)
+                        // userOrder = 3
+                        db.execSQL("""
+                            INSERT INTO rules 
+                            (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
+                            VALUES 
+                            ('Telegram (Proxy)', '', 3, 1, '$domainsTg', '', '', '', '', '', '', 0, '')
+                        """)
+
+                        // 5. Правило: RU Сегмент напрямую (outbound = -1)
+                        // userOrder = 4
+                        db.execSQL("""
+                            INSERT INTO rules 
+                            (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
+                            VALUES 
+                            ('RU Сегмент (Direct)', '', 4, 1, '$domainsRu', '$ipsRu', '', '', '', '', '', -1, '')
                         """)
                     }
                 })
