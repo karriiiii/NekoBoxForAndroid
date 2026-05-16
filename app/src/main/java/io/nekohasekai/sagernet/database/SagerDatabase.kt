@@ -51,7 +51,7 @@ abstract class SagerDatabase : RoomDatabase() {
                         
                         val domainsTg = "geosite:telegram\ntelegram.org\nt.me"
                         
-                        val domainsRu = "geosite:category-ru\nkeyword:yandex\nkeyword:yastatic\nkeyword:yadi.sk\nkeyword:xn--80aswg\nkeyword:xn--d1acpjx3f.xn--p1ai\nkeyword:xn--c1avg\nkeyword:xn--80asehdb\nkeyword:xn--p1acf\nkeyword:xn--p1ai\nkeyword:gstatic.com\nkeyword:tineye\nkeyword:vk.com\nkeyword:userapi.com\nkeyword:vk-cdn.me\nkeyword:mvk.com\nkeyword:vk-cdn.net\nkeyword:vk-portal.net\nkeyword:vk.cc\nkeyword:tradingview\ndomain:ru\ndomain:su\ndomain:by"
+                        val domainsRu = "keyword:yandex\nkeyword:yastatic\nkeyword:yadi.sk\nkeyword:xn--80aswg\nkeyword:xn--d1acpjx3f.xn--p1ai\nkeyword:xn--c1avg\nkeyword:xn--80asehdb\nkeyword:xn--p1acf\nkeyword:xn--p1ai\nkeyword:gstatic.com\nkeyword:tineye\nkeyword:vk.com\nkeyword:userapi.com\nkeyword:vk-cdn.me\nkeyword:mvk.com\nkeyword:vk-cdn.net\nkeyword:vk-portal.net\nkeyword:vk.cc\nkeyword:tradingview\ndomain:ru\ndomain:su\ndomain:by"
                         
                         val ipsRu = "geoip:private\ngeoip:ru\ngeoip:by"
 
@@ -63,10 +63,10 @@ abstract class SagerDatabase : RoomDatabase() {
                             INSERT INTO rules 
                             (name, config, userOrder, enabled, domains, ip, port, sourcePort, network, source, protocol, outbound, packages) 
                             VALUES 
-                            ('Блокировка QUIC', '', 0, 1, '', '', '', '', -2, '', '', -2, '')
+                            ('Блокировка QUIC', '', 0, 1, '', '', '443', '', 'udp', '', '', -2, '')
                         """)
 
-                        // 2. Правило: Блокировка рекламы (outbound = -2)
+                        // 2. Правило: Блокировка аналитики (outbound = -2)
                         // userOrder = 1 (Самый высокий приоритет, срабатывает первым)
                         db.execSQL("""
                             INSERT INTO rules 
